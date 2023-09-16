@@ -9,7 +9,7 @@ import { Square } from 'src/app/square';
 })
 export class GameComponent implements OnDestroy,OnInit {
 
-  squareSize=10;
+  squareSize=20;
   intervalTime=500;
   isGameOver=false;
   timeLine$!:Observable<number>;
@@ -27,17 +27,17 @@ export class GameComponent implements OnDestroy,OnInit {
   }
 
   ngOnInit(): void {
-    console.log('x:',this.randomIntFromInterval(0,400));
-    console.log('y:',this.randomIntFromInterval(0,600));
-    this.newSquare=new Square(120,140,this.squareSize,'green',this.isGameOver);
+    this.newSquare=new Square(
+      this.randomIntFromInterval(0,400-this.squareSize),
+      this.randomIntFromInterval(0,600-this.squareSize),
+      this.squareSize,'green',this.isGameOver);
     this.observer = {
       next:()=>{
         if(this.squares.length>1)
-        for(let i=1;i<this.squares.length;i++){
+        for(let i=this.squares.length-1;i>0;i--){
           let lastX=this.squares[i-1].getPositionX();
           let lastY=this.squares[i-1].getPositionY();
           this.squares[i].setPosition(lastX,lastY);
-          this.squares[i].setColor('red');
         }
         this.squares[0].move(this.direction,this.squareSize);
         
@@ -58,7 +58,8 @@ export class GameComponent implements OnDestroy,OnInit {
   }
 
   randomIntFromInterval(min:number, max:number) { // min and max included 
-    return Math.floor(Math.random() * (max - min + 1) + min);
+    let random = Math.floor(Math.random() * (max - min + 1) + min);
+    return Math.round(random/this.squareSize)*this.squareSize;
   }
 
   private stop(){
@@ -67,8 +68,9 @@ export class GameComponent implements OnDestroy,OnInit {
   }
 
   private restart(){
-    this.squares[0].setPosition(0,0);
-    this.squares[0].setHidde(false);
+    this.squares=[];
+    this.isGameOver=false;
+    this.squares.push(new Square(0,0,this.squareSize,'red',this.isGameOver));
     this.changeDirection('ArrowRight');
     this.timeLine$.subscribe(this.observer);
   }
@@ -86,10 +88,20 @@ export class GameComponent implements OnDestroy,OnInit {
     let samePosition=(
       front.getPositionX()===newSquare.getPositionX() && 
       front.getPositionY()==newSquare.getPositionY());
-    if(samePosition)
+    if(samePosition){
+      this.newSquare.setColor('red');
+      this.intervalTime-=10;
+      this.timeLine$ = interval(this.intervalTime).pipe(takeUntil(this.onDestroy$));
+      this.timeLine$.subscribe(this.observer);
       setTimeout(()=>{
         this.squares.push(this.newSquare);
+        this.newSquare = new Square(
+          this.randomIntFromInterval(0,400-this.squareSize),
+          this.randomIntFromInterval(0,600-this.squareSize),
+          this.squareSize,'green',this.isGameOver);
       },this.intervalTime);
+    }
+   
   }
 
   private changeDirection(direction:string){
