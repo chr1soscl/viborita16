@@ -1,0 +1,14 @@
+.game-box{
+  width: 400px;
+  height: 600px;
+  border: 1px black solid;
+  background-color: dodgerblue;
+  position: relative;
+}
+.message{
+    position: absolute;
+    border: 1px black solid;
+    border-radius: 4px;
+    padding: 5px;
+    background-color: gray;
+}

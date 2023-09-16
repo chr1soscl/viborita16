@@ -1,0 +1,8 @@
+<div class="game-box">
+    <square *ngFor="let square of squares" [square]="square"></square>
+    <square [square]="newSquare"></square>
+    <div class="message" *ngIf="isGameOver"
+    [style.left.px]="150"
+    [style.top.px]="200">Game Over!</div>
+</div>
+{{squares|json}}
