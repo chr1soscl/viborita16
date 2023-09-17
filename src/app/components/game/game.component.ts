@@ -59,10 +59,14 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
     this.keyUpSubscription=this.keyUp$.subscribe({
       next:value=>{
         //console.log(value.key)
-        if(value.key==='Escape') this.stop();
-        if(value.key==='Enter') this.restart();
-        if(value.key===' ') this.pause();
-        else this.changeDirection(value.key);
+        if(value.key==='Escape') 
+          this.stop();
+        else if(value.key==='Enter') 
+          this.restart();
+        else if(value.key===' ') 
+          this.pause();
+        else 
+          this.changeDirection(value.key);
       }
     });
   }
