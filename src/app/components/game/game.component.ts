@@ -12,11 +12,12 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
   squareSize=20;
   intervalTime=300;
   isGameOver=false;
-  timeLine$!:Observable<number>;
-  timeLineSubscription:any;
-  direction:string='right';
-  private keyUp$ = fromEvent<KeyboardEvent>(document, 'keyup');
+  private timeLine$:Observable<number>;
+  private keyUp$:Observable<KeyboardEvent>;
   private onDestroy$ = new Subject<void>();
+  timeLineSubscription:any;
+  keyUpSubscription:any;
+  direction:string='right';
   squares:Square[]=[];
   newSquare!:Square;
   observer:any;
@@ -26,8 +27,8 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
   @Input('goalPointColor') goalPointColor:string='green';
 
   constructor() {
-    this.timeLineSubscription =this.timeLine$ = interval(this.intervalTime).pipe(takeUntil(this.onDestroy$));
-    this.keyUp$.pipe(takeUntil(this.onDestroy$));
+    this.timeLine$ = interval(this.intervalTime).pipe(takeUntil(this.onDestroy$));
+    this.keyUp$ = fromEvent<KeyboardEvent>(document, 'keyup').pipe(takeUntil(this.onDestroy$));
   }
 
   ngOnInit(): void {
@@ -53,8 +54,8 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
         }
       }
     };
-    this.timeLine$.subscribe(this.observer);
-    this.keyUp$.subscribe({
+    this.timeLineSubscription=this.timeLine$.subscribe(this.observer);
+    this.keyUpSubscription=this.keyUp$.subscribe({
       next:value=>{
         //console.log(value.key)
         if(value.key==='Escape') this.stop();
@@ -82,9 +83,9 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
   }
 
   private stop(){
+    this.squares[0].setHidde(true);
     this.onDestroy$.next();
     this.timeLineSubscription.unsubscribe();
-    this.squares[0].setHidde(true);
   }
 
   private restart(){
@@ -102,7 +103,8 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
       square.getPositionY()<0 || 
       square.getPositionX()>=400 || 
       square.getPositionY()>=600);
-    if(this.isGameOver) this.stop();
+    if(this.isGameOver) 
+      this.stop();
   }
 
   private isThereCollision(front:Square,squares:Square[]){
@@ -160,6 +162,7 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
   }
 
   ngOnDestroy(): void {
+    this.keyUpSubscription.unsubscribe();
     this.stop();
   }
 
