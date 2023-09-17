@@ -7,4 +7,6 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'viborita16';
+  snakeColor:string='#F7340A';
+  goalPointColor:string='#35A05D';
 }

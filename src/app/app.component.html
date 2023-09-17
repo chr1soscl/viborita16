@@ -1,7 +1,20 @@
-<div class="app-container">
-  <game></game>
+<div class="flex-row body">
+  <div class="game-container">
+    <game 
+    [snakeColor]="snakeColor"
+    [goalPointColor]="goalPointColor"
+    ></game>
+  </div>
   <div class="instructions">
     <div>Escape - stop the game.</div>
     <div>Enter - restart.</div>
+    <div class="flex-row">
+      <label for="snakeColor">Snake Color:</label>
+      <input type="color" id="snakeColor" name="snakeColor" [(ngModel)]="snakeColor" />
+    </div>
+    <div class="flex-row">
+      <label for="goalPointColor">Goal Point Color:</label>
+      <input type="color" id="goalPointColor" name="goalPointColor" [(ngModel)]="goalPointColor" />
+    </div>
   </div>
 </div>
