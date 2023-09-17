@@ -125,9 +125,6 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
       front.getPositionY()==newSquare.getPositionY());
     if(samePosition){
       this.newSquare.setColor(this.snakeColor);
-      //this.intervalTime-=1;
-      // this.timeLine$ = interval(this.intervalTime).pipe(takeUntil(this.onDestroy$));
-      // this.timeLine$.subscribe(this.observer);
       setTimeout(()=>{
         this.squares.push(this.newSquare);
         this.newSquare = new Square(
