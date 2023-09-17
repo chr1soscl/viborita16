@@ -22,6 +22,7 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
   newSquare!:Square;
   observer:any;
   paused:boolean=true;
+  stopped:boolean=false;
 
   @Input('snakeColor') snakeColor:string='purple';
   @Input('goalPointColor') goalPointColor:string='green';
@@ -39,7 +40,7 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
       this.squareSize,this.goalPointColor,this.isGameOver);
     this.observer = {
       next:()=>{
-        if(!this.paused){
+        if(!this.paused && !this.stopped){
           if(this.squares.length>1)
             for(let i=this.squares.length-1;i>0;i--){
               let lastX=this.squares[i-1].getPositionX();
@@ -84,17 +85,15 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
 
   private stop(){
     this.squares[0].setHidde(true);
-    this.onDestroy$.next();
-    this.timeLineSubscription.unsubscribe();
+    this.stopped=true;
   }
 
   private restart(){
     this.squares=[];
     this.isGameOver=false;
     this.squares.push(new Square(0,0,this.squareSize,this.snakeColor,this.isGameOver));
-    this.changeDirection('ArrowRight');
-    this.timeLineSubscription.unsubscribe();
-    this.timeLineSubscription=this.timeLine$.subscribe(this.observer);
+    this.direction='right';
+    this.stopped=false;
   }
 
   private isGameOverFn(square:Square){
@@ -159,8 +158,7 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
   }
 
   ngOnDestroy(): void {
-    this.keyUpSubscription.unsubscribe();
-    this.stop();
+    this.onDestroy$.next();
   }
 
 }
