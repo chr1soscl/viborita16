@@ -9,23 +9,24 @@ import { Square } from 'src/app/square';
 })
 export class GameComponent implements OnDestroy,OnInit,OnChanges {
 
-  squareSize=10;
+  squareSize=20;
   intervalTime=300;
   isGameOver=false;
   timeLine$!:Observable<number>;
+  timeLineSubscription:any;
   direction:string='right';
   private keyUp$ = fromEvent<KeyboardEvent>(document, 'keyup');
   private onDestroy$ = new Subject<void>();
   squares:Square[]=[];
   newSquare!:Square;
   observer:any;
-  paused:boolean=false;
+  paused:boolean=true;
 
   @Input('snakeColor') snakeColor:string='purple';
   @Input('goalPointColor') goalPointColor:string='green';
 
   constructor() {
-    this.timeLine$ = interval(this.intervalTime).pipe(takeUntil(this.onDestroy$));
+    this.timeLineSubscription =this.timeLine$ = interval(this.intervalTime).pipe(takeUntil(this.onDestroy$));
     this.keyUp$.pipe(takeUntil(this.onDestroy$));
   }
 
@@ -82,6 +83,7 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
 
   private stop(){
     this.onDestroy$.next();
+    this.timeLineSubscription.unsubscribe();
     this.squares[0].setHidde(true);
   }
 
@@ -90,7 +92,8 @@ export class GameComponent implements OnDestroy,OnInit,OnChanges {
     this.isGameOver=false;
     this.squares.push(new Square(0,0,this.squareSize,this.snakeColor,this.isGameOver));
     this.changeDirection('ArrowRight');
-    this.timeLine$.subscribe(this.observer);
+    this.timeLineSubscription.unsubscribe();
+    this.timeLineSubscription=this.timeLine$.subscribe(this.observer);
   }
 
   private isGameOverFn(square:Square){
